@@ -1,0 +1,24 @@
+{
+  "name": "events",
+  "version": "1.0.0",
+  "description": "Expirementing near fully typed TypeScript events",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darkartur/events.git"
+  },
+  "keywords": [
+    "typescript",
+    "events",
+    "typed"
+  ],
+  "author": "Arthur Udalov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/darkartur/events/issues"
+  },
+  "homepage": "https://github.com/darkartur/events"
+}
