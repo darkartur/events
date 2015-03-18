@@ -38,4 +38,17 @@ describe("events", () => {
         expect(fire_b).to.be(true);
     });
 
+    it("off", () => {
+        var event_is_fired: boolean = false;
+
+        event.on(() => {
+            event_is_fired = true;
+        });
+
+        event.off();
+        event.trigger();
+
+        expect(event_is_fired).to.be(false);
+    });
+
 });

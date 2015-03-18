@@ -12,6 +12,11 @@ class Event {
         return this;
     }
 
+    off(): Event {
+        this.handlers = [];
+        return this;
+    }
+
     private handlers: Array<() => void> = [];
 }
 
