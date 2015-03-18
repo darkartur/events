@@ -1,8 +1,9 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 /// <reference path="../typings/node/node.d.ts" />
+/// <reference path="../typings/expect/expect.d.ts" />
 require('source-map-support').install();
 
-import assert = require("assert");
+import expect = require("expect");
 
 import Event = require('../index');
 
@@ -33,8 +34,8 @@ describe("events", () => {
 
         event.trigger();
 
-        assert.strictEqual(fire_a, true);
-        assert.strictEqual(fire_b, true);
+        expect(fire_a).to.be(true);
+        expect(fire_b).to.be(true);
     });
 
 });
