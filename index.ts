@@ -3,6 +3,7 @@ class Event {
     add(): Event {
         var child: Event = new Event();
         this.children.push(child);
+        child.parent = this;
         return child;
     }
 
@@ -23,6 +24,11 @@ class Event {
                 this.off(handler.callback)
             }
         });
+
+        if (this.parent) {
+            this.parent.trigger();
+        }
+
         return this;
     }
 
@@ -93,6 +99,7 @@ class Event {
         });
     }
 
+    private parent: Event;
     private children: Event[] = [];
     private handlers: Array<Handler> = [];
     private listenings: Array<Listening> = [];

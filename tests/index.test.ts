@@ -213,6 +213,14 @@ describe("events", () => {
             expect(is_fired).to.be(false);
         });
 
+        it("tree trigger", (done) => {
+            var parent: Event = new Event(),
+                child: Event = parent.add();
+
+            parent.on(done);
+            child.trigger();
+        });
+
     });
 
 });
