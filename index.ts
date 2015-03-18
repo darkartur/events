@@ -21,14 +21,25 @@ class Event {
     }
 
     off(handler?: () => void): Event {
-        this.handlers = handler ? this.handlers.filter((someHandler) => {
-            return someHandler.callback !== handler;
-        }) : [];
+        this.handlers = this.handlers.filter((someHandler: Handler) => {
+            var listener: Event = someHandler.listener;
+
+            if (isSameOrFalsy(someHandler.callback, handler)) {
+                if (listener) {
+                    listener.removeListening(this, someHandler.callback)
+                }
+
+                return false;
+            }
+
+            return true;
+        });
+
         return this;
     }
 
     listenTo(source: Event, handler: () => void): Event {
-        source.on(handler);
+        source.addHandler(handler, false, this);
         this.listenings.push({
             source: source,
             handler: handler
@@ -37,7 +48,7 @@ class Event {
     }
 
     listenToOnce(source: Event, handler: () => void): Event {
-        source.once(handler);
+        source.addHandler(handler, true, this);
         this.listenings.push({
             source: source,
             handler: handler
@@ -46,7 +57,7 @@ class Event {
     }
 
     stopListening(source?: Event, handler?: () => void): Event {
-        this.listenings = this.listenings.filter((listening: Listening) => {
+        this.listenings.forEach((listening: Listening) => {
             if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, handler)) {
                 listening.source.off(listening.handler);
                 return false;
@@ -58,10 +69,17 @@ class Event {
         return this;
     }
 
-    private addHandler(callback: () => void, once: boolean = false) {
+    private addHandler(callback: () => void, once: boolean = false, listener?: Event) {
         this.handlers.push({
             callback: callback,
-            once: once
+            once: once,
+            listener: listener
+        });
+    }
+
+    private removeListening(source: Event, handler: () => void) {
+        this.listenings.filter((listening: Listening) => {
+            return listening.handler != handler || listening.source != source;
         });
     }
 
@@ -77,6 +95,7 @@ interface Listening {
 interface Handler {
     callback: () => void;
     once: boolean;
+    listener: Event;
 }
 
 function isSameOrFalsy(staff, same_or_falsy) {
