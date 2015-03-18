@@ -216,7 +216,7 @@ declare module Expect {
     }
 }
 
-declare module "expect" {
+declare module "expect.js" {
 
     export = expect;
 

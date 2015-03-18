@@ -3,7 +3,7 @@
 /// <reference path="../typings/expect/expect.d.ts" />
 require('source-map-support').install();
 
-import expect = require("expect");
+import expect = require("expect.js");
 
 import Event = require('../index');
 

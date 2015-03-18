@@ -27,6 +27,6 @@
   "devDependencies": {
     "mocha": "^2.2.1",
     "source-map-support": "^0.2.10",
-    "expect": "latest"
+    "expect.js": "latest"
   }
 }
