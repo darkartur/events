@@ -1,5 +1,11 @@
 class Event {
 
+    add(): Event {
+        var child: Event = new Event();
+        this.children.push(child);
+        return child;
+    }
+
     on(handler: () => void): Event {
         this.addHandler(handler);
         return this;
@@ -33,6 +39,10 @@ class Event {
             }
 
             return true;
+        });
+
+        this.children.forEach((child: Event) => {
+            child.off();
         });
 
         return this;
@@ -83,6 +93,7 @@ class Event {
         });
     }
 
+    private children: Event[] = [];
     private handlers: Array<Handler> = [];
     private listenings: Array<Listening> = [];
 }

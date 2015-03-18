@@ -9,177 +9,210 @@ import Event = require('../index');
 
 describe("events", () => {
 
-    var event: Event;
+    describe("single event", () => {
 
-    beforeEach(() => {
-        event = new Event();
-    });
+        var event: Event;
 
-    it("on and trigger", (done) => {
-        event.on(done);
-        event.trigger();
-    });
-
-    it("multiple callbacks", () => {
-        var fire_a: boolean = false,
-            fire_b: boolean = false;
-
-        event.on(() => {
-            fire_a = true;
+        beforeEach(() => {
+            event = new Event();
         });
 
-        event.on(() => {
-            fire_b = true;
+        it("on and trigger", (done) => {
+            event.on(done);
+            event.trigger();
         });
 
-        event.trigger();
+        it("multiple callbacks", () => {
+            var fire_a: boolean = false,
+                fire_b: boolean = false;
 
-        expect(fire_a).to.be(true);
-        expect(fire_b).to.be(true);
-    });
+            event.on(() => {
+                fire_a = true;
+            });
 
-    it("multiple trigger", () => {
-        var counter: number = 0;
+            event.on(() => {
+                fire_b = true;
+            });
 
-        event.on(() => {
-            counter++;
+            event.trigger();
+
+            expect(fire_a).to.be(true);
+            expect(fire_b).to.be(true);
         });
 
-        event.trigger();
-        event.trigger();
-        event.trigger();
+        it("multiple trigger", () => {
+            var counter: number = 0;
 
-        expect(counter).to.be(3);
-    });
+            event.on(() => {
+                counter++;
+            });
 
-    it("once", () => {
-        var counter: number = 0;
+            event.trigger();
+            event.trigger();
+            event.trigger();
 
-        event.once(() => {
-            counter++;
+            expect(counter).to.be(3);
         });
 
-        event.trigger();
-        event.trigger();
+        it("once", () => {
+            var counter: number = 0;
 
-        expect(counter).to.be(1);
-    });
+            event.once(() => {
+                counter++;
+            });
 
-    it("once + on", (done) => {
-        event.once(() => {});
-        event.on(done);
+            event.trigger();
+            event.trigger();
 
-        event.trigger();
-    });
-
-    it("off", () => {
-        var event_is_fired: boolean = false;
-
-        event.on(() => {
-            event_is_fired = true;
+            expect(counter).to.be(1);
         });
 
-        event.off();
-        event.trigger();
+        it("once + on", (done) => {
+            event.once(() => {});
+            event.on(done);
 
-        expect(event_is_fired).to.be(false);
-    });
-
-    it("off target handler", (done) => {
-        var disablingHandler: () => void = () => {};
-
-        event.on(disablingHandler);
-        event.on(done);
-
-        event.off(disablingHandler);
-        event.trigger();
-    });
-
-    it("listenTo and stopListening", () => {
-        var eventListener: Event = new Event(),
-            counter: number = 0;
-
-        eventListener.listenTo(event, () => {
-            counter++;
+            event.trigger();
         });
 
-        event.trigger();
-        event.trigger();
+        it("off", () => {
+            var event_is_fired: boolean = false;
 
-        eventListener.stopListening(event);
+            event.on(() => {
+                event_is_fired = true;
+            });
 
-        event.trigger();
+            event.off();
+            event.trigger();
 
-        expect(counter).to.be(2);
-    });
-
-    it("listenToOnce", () => {
-        var eventListener: Event = new Event(),
-            counter: number = 0;
-
-        eventListener.listenToOnce(event, () => {
-            counter++;
+            expect(event_is_fired).to.be(false);
         });
 
-        event.trigger();
-        event.trigger();
+        it("off target handler", (done) => {
+            var disablingHandler: () => void = () => {};
 
-        expect(counter).to.be(1);
-    });
+            event.on(disablingHandler);
+            event.on(done);
 
-    it("listenToOnce and stopListening", () => {
-        var eventListener: Event = new Event(),
-            counter: number = 0;
-
-        eventListener.listenToOnce(event, () => {
-            counter++;
+            event.off(disablingHandler);
+            event.trigger();
         });
 
-        eventListener.stopListening(event)
+        it("listenTo and stopListening", () => {
+            var eventListener: Event = new Event(),
+                counter: number = 0;
 
-        event.trigger();
+            eventListener.listenTo(event, () => {
+                counter++;
+            });
 
-        expect(counter).to.be(0);
+            event.trigger();
+            event.trigger();
+
+            eventListener.stopListening(event);
+
+            event.trigger();
+
+            expect(counter).to.be(2);
+        });
+
+        it("listenToOnce", () => {
+            var eventListener: Event = new Event(),
+                counter: number = 0;
+
+            eventListener.listenToOnce(event, () => {
+                counter++;
+            });
+
+            event.trigger();
+            event.trigger();
+
+            expect(counter).to.be(1);
+        });
+
+        it("listenToOnce and stopListening", () => {
+            var eventListener: Event = new Event(),
+                counter: number = 0;
+
+            eventListener.listenToOnce(event, () => {
+                counter++;
+            });
+
+            eventListener.stopListening(event)
+
+            event.trigger();
+
+            expect(counter).to.be(0);
+        });
+
+        it("stopListening should off only listener handlers", (done) => {
+            var eventListener: Event = new Event();
+
+            event.on(done);
+
+            eventListener.stopListening(event);
+            event.trigger();
+        });
+
+        it("stopListening target handler", (done) => {
+            var event_listener: Event = new Event(),
+                disablingHandler: () => void = () => {};
+
+            event_listener.listenTo(event, disablingHandler);
+            event_listener.listenTo(event, done);
+
+            event_listener.stopListening(event, disablingHandler);
+            event.trigger();
+        });
+
+        it("stopListening all", () => {
+            var listener: Event = new Event(),
+                other_event: Event = new Event(),
+                is_fired: boolean = false;
+
+            function cb() {
+                is_fired = true;
+            }
+
+            listener.listenTo(event, cb);
+            listener.listenTo(other_event, cb);
+
+            listener.stopListening();
+
+            event.trigger();
+            other_event.trigger();
+
+            expect(is_fired).to.be(false);
+        });
+
     });
 
-    it("stopListening should off only listener handlers", (done) => {
-        var eventListener: Event = new Event();
+    describe("hierarchical events", () => {
 
-        event.on(done);
+        it("tree off", () => {
+            var root: Event,
+                childA: Event,
+                childB: Event,
+                is_fired: boolean = false;
 
-        eventListener.stopListening(event);
-        event.trigger();
-    });
+            function handler() {
+                is_fired = true;
+            }
 
-    it("stopListening target handler", (done) => {
-        var event_listener: Event = new Event(),
-            disablingHandler: () => void = () => {};
+            root = new Event();
+            childA = root.add();
+            childB = root.add();
 
-        event_listener.listenTo(event, disablingHandler);
-        event_listener.listenTo(event, done);
+            childA.on(handler);
+            childB.on(handler);
 
-        event_listener.stopListening(event, disablingHandler);
-        event.trigger();
-    });
+            root.off();
 
-    it("stopListening all", () => {
-        var listener: Event = new Event(),
-            other_event: Event = new Event(),
-            is_fired: boolean = false;
+            childA.trigger();
+            childB.trigger();
 
-        function cb() {
-            is_fired = true;
-        }
+            expect(is_fired).to.be(false);
+        });
 
-        listener.listenTo(event, cb);
-        listener.listenTo(other_event, cb);
-
-        listener.stopListening();
-
-        event.trigger();
-        other_event.trigger();
-
-        expect(is_fired).to.be(false);
     });
 
 });
