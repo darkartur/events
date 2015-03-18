@@ -38,6 +38,33 @@ describe("events", () => {
         expect(fire_b).to.be(true);
     });
 
+    it("multiple trigger", () => {
+        var counter: number = 0;
+
+        event.on(() => {
+            counter++;
+        });
+
+        event.trigger();
+        event.trigger();
+        event.trigger();
+
+        expect(counter).to.be(3);
+    });
+
+    it("once", () => {
+        var counter: number = 0;
+
+        event.once(() => {
+            counter++;
+        });
+
+        event.trigger();
+        event.trigger();
+
+        expect(counter).to.be(1);
+    });
+
     it("off", () => {
         var event_is_fired: boolean = false;
 

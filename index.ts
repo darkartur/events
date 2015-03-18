@@ -1,21 +1,29 @@
 class Event {
 
     on(handler: () => void): Event {
-        this.handlers.push(handler);
+        this.addHandler(handler);
+        return this;
+    }
+
+    once(handler: () => void): Event {
+        this.addHandler(handler, true);
         return this;
     }
 
     trigger(): Event {
-        this.handlers.forEach((handler: () => void) => {
-            handler();
+        this.handlers.forEach((handler: Handler) => {
+            handler.callback();
+            if (handler.once) {
+                this.off(handler.callback)
+            }
         });
         return this;
     }
 
     off(handler?: () => void): Event {
         this.handlers = handler ? this.handlers.filter((someHandler) => {
-            return someHandler !== handler;
-        }): [];
+            return someHandler.callback !== handler;
+        }) : [];
         return this;
     }
 
@@ -41,13 +49,25 @@ class Event {
         return this;
     }
 
-    private handlers: Array<() => void> = [];
+    private addHandler(callback: () => void, once: boolean = false) {
+        this.handlers.push({
+            callback: callback,
+            once: once
+        });
+    }
+
+    private handlers: Array<Handler> = [];
     private listenings: Array<Listening> = [];
 }
 
 interface Listening {
     source: Event;
     handler: () => void;
+}
+
+interface Handler {
+    callback: () => void;
+    once: boolean;
 }
 
 function isSameOrFalsy(staff, same_or_falsy) {
