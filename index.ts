@@ -17,6 +17,16 @@ class Event {
         return this;
     }
 
+    listenTo(source: Event, handler: () => void): Event {
+        source.on(handler);
+        return this;
+    }
+
+    stopListening(source: Event): Event {
+        source.off();
+        return this;
+    }
+
     private handlers: Array<() => void> = [];
 }
 

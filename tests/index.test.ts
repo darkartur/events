@@ -51,4 +51,19 @@ describe("events", () => {
         expect(event_is_fired).to.be(false);
     });
 
+    it("listenTo and stopListening", () => {
+        var eventListener: Event = new Event(),
+            counter: number = 0;
+
+        eventListener.listenTo(event, () => {
+            counter++;
+        });
+
+        event.trigger();
+
+        eventListener.stopListening(event);
+
+        expect(counter).to.be(1);
+    });
+
 });
