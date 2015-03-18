@@ -1,5 +1,5 @@
 {
-  "name": "events",
+  "name": "events_ts",
   "version": "1.0.0",
   "description": "Expirementing near fully typed TypeScript events",
   "main": "index.js",
@@ -20,5 +20,12 @@
   "bugs": {
     "url": "https://github.com/darkartur/events/issues"
   },
-  "homepage": "https://github.com/darkartur/events"
+  "homepage": "https://github.com/darkartur/events",
+  "dependencies": {
+    "typescript": "latest"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "source-map-support": "^0.2.10"
+  }
 }
