@@ -65,6 +65,13 @@ describe("events", () => {
         expect(counter).to.be(1);
     });
 
+    it("once + on", (done) => {
+        event.once(() => {});
+        event.on(done);
+
+        event.trigger();
+    });
+
     it("off", () => {
         var event_is_fired: boolean = false;
 
