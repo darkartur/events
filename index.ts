@@ -36,6 +36,15 @@ class Event {
         return this;
     }
 
+    listenToOnce(source: Event, handler: () => void): Event {
+        source.once(handler);
+        this.listenings.push({
+            source: source,
+            handler: handler
+        });
+        return this;
+    }
+
     stopListening(source?: Event, handler?: () => void): Event {
         this.listenings = this.listenings.filter((listening: Listening) => {
             if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, handler)) {

@@ -104,10 +104,42 @@ describe("events", () => {
         });
 
         event.trigger();
+        event.trigger();
 
         eventListener.stopListening(event);
 
+        event.trigger();
+
+        expect(counter).to.be(2);
+    });
+
+    it("listenToOnce", () => {
+        var eventListener: Event = new Event(),
+            counter: number = 0;
+
+        eventListener.listenToOnce(event, () => {
+            counter++;
+        });
+
+        event.trigger();
+        event.trigger();
+
         expect(counter).to.be(1);
+    });
+
+    it("listenToOnce and stopListening", () => {
+        var eventListener: Event = new Event(),
+            counter: number = 0;
+
+        eventListener.listenToOnce(event, () => {
+            counter++;
+        });
+
+        eventListener.stopListening(event)
+
+        event.trigger();
+
+        expect(counter).to.be(0);
     });
 
     it("stopListening should off only listener handlers", (done) => {
