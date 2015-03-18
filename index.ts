@@ -28,13 +28,10 @@ class Event {
         return this;
     }
 
-    stopListening(source: Event, handler?: () => void): Event {
+    stopListening(source?: Event, handler?: () => void): Event {
         this.listenings = this.listenings.filter((listening: Listening) => {
-            var isTargetHandler: boolean = !handler || handler === listening.handler,
-                isTargetSource: boolean = listening.source == source;
-
-            if (isTargetSource && isTargetHandler) {
-                source.off(listening.handler);
+            if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, handler)) {
+                listening.source.off(listening.handler);
                 return false;
             }
 
@@ -51,6 +48,10 @@ class Event {
 interface Listening {
     source: Event;
     handler: () => void;
+}
+
+function isSameOrFalsy(staff, same_or_falsy) {
+    return !same_or_falsy || staff == same_or_falsy;
 }
 
 export = Event;

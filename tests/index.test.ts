@@ -96,4 +96,24 @@ describe("events", () => {
         event.trigger();
     });
 
+    it("stopListening all", () => {
+        var listener: Event = new Event(),
+            other_event: Event = new Event(),
+            is_fired: boolean = false;
+
+        function cb() {
+            is_fired = true;
+        }
+
+        listener.listenTo(event, cb);
+        listener.listenTo(other_event, cb);
+
+        listener.stopListening();
+
+        event.trigger();
+        other_event.trigger();
+
+        expect(is_fired).to.be(false);
+    });
+
 });
