@@ -1,25 +1,25 @@
-class Event {
+class Event<TParam> {
 
-    add(): Event {
-        var child: Event = new Event();
+    add<TChildParam>(): Event<TChildParam> {
+        var child: Event<TChildParam> = new Event<TChildParam>();
         this.children.push(child);
         child.parent = this;
         return child;
     }
 
-    on(handler: () => void): Event {
+    on(handler: Callback<TParam>): Event<TParam> {
         this.addHandler(handler);
         return this;
     }
 
-    once(handler: () => void): Event {
+    once(handler: Callback<TParam>): Event<TParam> {
         this.addHandler(handler, true);
         return this;
     }
 
-    trigger(): Event {
-        this.handlers.forEach((handler: Handler) => {
-            handler.callback();
+    trigger(): Event<TParam> {
+        this.handlers.forEach((handler: Handler<TParam>) => {
+            handler.callback(null);
             if (handler.once) {
                 this.off(handler.callback)
             }
@@ -32,9 +32,9 @@ class Event {
         return this;
     }
 
-    off(handler?: () => void): Event {
-        this.handlers = this.handlers.filter((someHandler: Handler) => {
-            var listener: Event = someHandler.listener;
+    off(handler?: Callback<TParam>): Event<TParam> {
+        this.handlers = this.handlers.filter((someHandler: Handler<TParam>) => {
+            var listener: Event<TParam> = someHandler.listener;
 
             if (isSameOrFalsy(someHandler.callback, handler)) {
                 if (listener) {
@@ -47,14 +47,14 @@ class Event {
             return true;
         });
 
-        this.children.forEach((child: Event) => {
+        this.children.forEach((child: Event<TParam>) => {
             child.off();
         });
 
         return this;
     }
 
-    listenTo(source: Event, handler: () => void): Event {
+    listenTo<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
         source.addHandler(handler, false, this);
         this.listenings.push({
             source: source,
@@ -63,7 +63,7 @@ class Event {
         return this;
     }
 
-    listenToOnce(source: Event, handler: () => void): Event {
+    listenToOnce<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
         source.addHandler(handler, true, this);
         this.listenings.push({
             source: source,
@@ -72,8 +72,8 @@ class Event {
         return this;
     }
 
-    stopListening(source?: Event, handler?: () => void): Event {
-        this.listenings.forEach((listening: Listening) => {
+    stopListening<TSourceParam>(source?: Event<TSourceParam>, handler?: Callback<TSourceParam>): Event<TParam> {
+        this.listenings.forEach((listening: Listening<TSourceParam>) => {
             if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, handler)) {
                 listening.source.off(listening.handler);
                 return false;
@@ -85,7 +85,7 @@ class Event {
         return this;
     }
 
-    private addHandler(callback: () => void, once: boolean = false, listener?: Event) {
+    private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: AnyEvent) {
         this.handlers.push({
             callback: callback,
             once: once,
@@ -93,28 +93,34 @@ class Event {
         });
     }
 
-    private removeListening(source: Event, handler: () => void) {
-        this.listenings.filter((listening: Listening) => {
+    private removeListening<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>) {
+        this.listenings.filter((listening: Listening<TSourceParam>) => {
             return listening.handler != handler || listening.source != source;
         });
     }
 
-    private parent: Event;
-    private children: Event[] = [];
-    private handlers: Array<Handler> = [];
-    private listenings: Array<Listening> = [];
+    private parent: AnyEvent;
+    private children: AnyEvent[] = [];
+    private handlers: Array<Handler<TParam>> = [];
+    private listenings: Array<Listening<any>> = [];
 }
 
-interface Listening {
-    source: Event;
-    handler: () => void;
+interface Listening<TParam> {
+    source: Event<TParam>;
+    handler: Callback<TParam>;
 }
 
-interface Handler {
-    callback: () => void;
+interface Handler<TParam> {
+    callback: Callback<TParam>;
     once: boolean;
-    listener: Event;
+    listener: Event<any>;
 }
+
+interface Callback<TParam> {
+    (param: TParam): void;
+}
+
+class AnyEvent extends Event<any> {}
 
 function isSameOrFalsy(staff, same_or_falsy) {
     return !same_or_falsy || staff == same_or_falsy;

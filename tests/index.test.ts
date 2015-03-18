@@ -11,10 +11,10 @@ describe("events", () => {
 
     describe("single event", () => {
 
-        var event: Event;
+        var event: VoidEvent;
 
         beforeEach(() => {
-            event = new Event();
+            event = new VoidEvent();
         });
 
         it("on and trigger", (done) => {
@@ -98,7 +98,7 @@ describe("events", () => {
         });
 
         it("listenTo and stopListening", () => {
-            var eventListener: Event = new Event(),
+            var eventListener: VoidEvent = new VoidEvent(),
                 counter: number = 0;
 
             eventListener.listenTo(event, () => {
@@ -116,7 +116,7 @@ describe("events", () => {
         });
 
         it("listenToOnce", () => {
-            var eventListener: Event = new Event(),
+            var eventListener: VoidEvent = new VoidEvent(),
                 counter: number = 0;
 
             eventListener.listenToOnce(event, () => {
@@ -130,14 +130,14 @@ describe("events", () => {
         });
 
         it("listenToOnce and stopListening", () => {
-            var eventListener: Event = new Event(),
+            var eventListener: VoidEvent = new VoidEvent(),
                 counter: number = 0;
 
             eventListener.listenToOnce(event, () => {
                 counter++;
             });
 
-            eventListener.stopListening(event)
+            eventListener.stopListening(event);
 
             event.trigger();
 
@@ -145,7 +145,7 @@ describe("events", () => {
         });
 
         it("stopListening should off only listener handlers", (done) => {
-            var eventListener: Event = new Event();
+            var eventListener: VoidEvent = new VoidEvent();
 
             event.on(done);
 
@@ -154,7 +154,7 @@ describe("events", () => {
         });
 
         it("stopListening target handler", (done) => {
-            var event_listener: Event = new Event(),
+            var event_listener: VoidEvent = new VoidEvent(),
                 disablingHandler: () => void = () => {};
 
             event_listener.listenTo(event, disablingHandler);
@@ -165,8 +165,8 @@ describe("events", () => {
         });
 
         it("stopListening all", () => {
-            var listener: Event = new Event(),
-                other_event: Event = new Event(),
+            var listener: VoidEvent = new VoidEvent(),
+                other_event: VoidEvent = new VoidEvent(),
                 is_fired: boolean = false;
 
             function cb() {
@@ -189,18 +189,18 @@ describe("events", () => {
     describe("hierarchical events", () => {
 
         it("tree off", () => {
-            var root: Event,
-                childA: Event,
-                childB: Event,
+            var root: VoidEvent,
+                childA: VoidEvent,
+                childB: VoidEvent,
                 is_fired: boolean = false;
 
             function handler() {
                 is_fired = true;
             }
 
-            root = new Event();
-            childA = root.add();
-            childB = root.add();
+            root = new VoidEvent();
+            childA = root.add<void>();
+            childB = root.add<void>();
 
             childA.on(handler);
             childB.on(handler);
@@ -214,8 +214,8 @@ describe("events", () => {
         });
 
         it("tree trigger", (done) => {
-            var parent: Event = new Event(),
-                child: Event = parent.add();
+            var parent: VoidEvent = new VoidEvent(),
+                child: VoidEvent = parent.add<void>();
 
             parent.on(done);
             child.trigger();
@@ -224,3 +224,5 @@ describe("events", () => {
     });
 
 });
+
+class VoidEvent extends Event<void> {}
