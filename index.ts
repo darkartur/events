@@ -17,9 +17,9 @@ class Event<TParam> {
         return this;
     }
 
-    trigger(): Event<TParam> {
+    trigger(param?: TParam): Event<TParam> {
         this.handlers.forEach((handler: Handler<TParam>) => {
-            handler.callback(null);
+            handler.callback(param);
             if (handler.once) {
                 this.off(handler.callback)
             }

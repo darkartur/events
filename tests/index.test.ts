@@ -223,4 +223,25 @@ describe("events", () => {
 
     });
 
+    describe("events with parameter", () => {
+        var event: Event<number>;
+
+        beforeEach(() => {
+            event = new Event<number>();
+        });
+
+        it("on", () => {
+            var fired_value: number = null;
+
+            event.on((param: number) => {
+                fired_value = param;
+            });
+
+            event.trigger(10);
+            expect(fired_value).to.be(10);
+
+        });
+
+    });
+
 });
