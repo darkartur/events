@@ -242,6 +242,44 @@ describe("events", () => {
 
         });
 
+        it("once", () => {
+            var fired_value: number = null;
+
+            event.once((param: number) => {
+                fired_value = param;
+            });
+
+            event.trigger(10);
+            expect(fired_value).to.be(10);
+
+        });
+
+        it("listenTo", () => {
+            var fired_value: number = null,
+                listener: Event<number> = new Event<number>();
+
+            listener.listenTo(event,(param: number) => {
+                fired_value = param;
+            });
+
+            event.trigger(10);
+            expect(fired_value).to.be(10);
+
+        });
+
+        it("listenToOnce", () => {
+            var fired_value: number = null,
+                listener: Event<number> = new Event<number>();
+
+            listener.listenToOnce(event,(param: number) => {
+                fired_value = param;
+            });
+
+            event.trigger(10);
+            expect(fired_value).to.be(10);
+
+        });
+
     });
 
 });
