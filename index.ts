@@ -28,9 +28,12 @@ class Event {
         return this;
     }
 
-    stopListening(source: Event): Event {
+    stopListening(source: Event, handler?: () => void): Event {
         this.listenings = this.listenings.filter((listening: Listening) => {
-            if (listening.source == source) {
+            var isTargetHandler: boolean = !handler || handler === listening.handler,
+                isTargetSource: boolean = listening.source == source;
+
+            if (isTargetSource && isTargetHandler) {
                 source.off(listening.handler);
                 return false;
             }

@@ -76,14 +76,23 @@ describe("events", () => {
         expect(counter).to.be(1);
     });
 
-
-
     it("stopListening should off only listener handlers", (done) => {
         var eventListener: Event = new Event();
 
         event.on(done);
 
         eventListener.stopListening(event);
+        event.trigger();
+    });
+
+    it("stopListening target handler", (done) => {
+        var event_listener: Event = new Event(),
+            disablingHandler: () => void = () => {};
+
+        event_listener.listenTo(event, disablingHandler);
+        event_listener.listenTo(event, done);
+
+        event_listener.stopListening(event, disablingHandler);
         event.trigger();
     });
 
