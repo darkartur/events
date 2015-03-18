@@ -4,8 +4,14 @@ require('source-map-support').install();
 
 import assert = require("assert");
 
-describe("simple test case", () => {
-    it("simple test", () => {
-        assert.equal(true, true);
+import Event = require('../index');
+
+describe("events", () => {
+
+    it("on and trigger", (done) => {
+        var event: Event = new Event();
+
+        event.on(done);
+        event.trigger();
     })
 });

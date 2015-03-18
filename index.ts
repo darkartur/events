@@ -1,12 +1,16 @@
 class Event {
 
-    private message: string = 'Hello world!';
-
-    greet() {
-        console.log(this.message);
+    on(handler: () => void): Event {
+        this.handler = handler;
+        return this;
     }
+
+    trigger(): Event {
+        this.handler();
+        return this;
+    }
+
+    private handler: () => void;
 }
 
-var greeter: Event = new Event();
-
-greeter.greet();
+export = Event;
