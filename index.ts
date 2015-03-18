@@ -85,7 +85,7 @@ class Event<TParam> {
         return this;
     }
 
-    private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: AnyEvent) {
+    private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: Event<any>) {
         this.handlers.push({
             callback: callback,
             once: once,
@@ -99,8 +99,8 @@ class Event<TParam> {
         });
     }
 
-    private parent: AnyEvent;
-    private children: AnyEvent[] = [];
+    private parent: Event<any>;
+    private children: Event<any>[] = [];
     private handlers: Array<Handler<TParam>> = [];
     private listenings: Array<Listening<any>> = [];
 }
@@ -119,8 +119,6 @@ interface Handler<TParam> {
 interface Callback<TParam> {
     (param: TParam): void;
 }
-
-class AnyEvent extends Event<any> {}
 
 function isSameOrFalsy(staff, same_or_falsy) {
     return !same_or_falsy || staff == same_or_falsy;
