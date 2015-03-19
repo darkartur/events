@@ -314,6 +314,23 @@ describe("events", () => {
 
         });
 
+        it("parameters in tree", () => {
+            var parent: Event<string>,
+                child: Event<void>,
+                fired_parameter: string = null;
+
+            parent = new Event<string>();
+            child = parent.add<void>("test");
+
+            parent.on((param: string) => {
+                fired_parameter = param;
+            });
+
+            child.trigger();
+
+            expect(fired_parameter).to.be("test");
+        });
+
     });
 
 });

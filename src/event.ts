@@ -1,9 +1,10 @@
 class Event<TParam> {
 
-    add<TChildParam>(): Event<TChildParam> {
+    add<TChildParam>(child_param?: TParam): Event<TChildParam> {
         var child: Event<TChildParam> = new Event<TChildParam>();
         this.children.push(child);
         child.parent = this;
+        child.parent_param = child_param;
         return child;
     }
 
@@ -26,7 +27,7 @@ class Event<TParam> {
         });
 
         if (this.parent) {
-            this.parent.trigger();
+            this.parent.trigger(this.parent_param);
         }
 
         return this;
@@ -110,6 +111,7 @@ class Event<TParam> {
     }
 
     private parent: Event<any>;
+    private parent_param: any;
     private children: Event<any>[] = [];
     private handlers: Array<Handler<TParam>> = [];
     private listenings: Array<Listening<any>> = [];
