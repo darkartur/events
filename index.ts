@@ -72,14 +72,24 @@ class Event<TParam> {
         return this;
     }
 
-    stopListening<TSourceParam>(source?: Event<TSourceParam>, handler?: Callback<TSourceParam>): Event<TParam> {
+    stopListening<TSourceParam>(source?: Event<TSourceParam>, callback?: Callback<TSourceParam>): Event<TParam> {
         this.listenings.forEach((listening: Listening<TSourceParam>) => {
-            if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, handler)) {
+            if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, callback)) {
                 listening.source.off(listening.handler);
                 return false;
             }
 
             return true;
+        });
+
+        if (source) {
+            source.children.forEach((child: Event<any>) => {
+                this.stopListening(child, callback);
+            });
+        }
+
+        this.children.forEach((child: Event<any>) => {
+            child.stopListening(source, callback);
         });
 
         return this;

@@ -221,6 +221,40 @@ describe("events", () => {
             child.trigger();
         });
 
+        it("stopListening source children", () => {
+            var listener: Event<void> = new Event<void>(),
+                parent: Event<void> = new Event<void>(),
+                child: Event<void> = parent.add<void>(),
+                is_fired: boolean = false;
+
+            listener.listenTo(child, () => {
+                is_fired = true;
+            });
+
+            listener.stopListening(parent);
+
+            child.trigger();
+
+            expect(is_fired).to.be(false);
+        });
+
+        it("stopListening source children", () => {
+            var source: Event<void> = new Event<void>(),
+                parent: Event<void> = new Event<void>(),
+                child: Event<void> = parent.add<void>(),
+                is_fired: boolean = false;
+
+            child.listenTo(source, () => {
+                is_fired = true;
+            });
+
+            parent.stopListening(source);
+
+            source.trigger();
+
+            expect(is_fired).to.be(false);
+        });
+
     });
 
     describe("events with parameter", () => {
