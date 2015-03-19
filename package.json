@@ -2,7 +2,7 @@
   "name": "howl",
   "version": "0.1.0",
   "description": "Fully typed typescript events",
-  "main": "index.js",
+  "main": "src/event.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
