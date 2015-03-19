@@ -1,7 +1,7 @@
 {
-  "name": "events_ts",
-  "version": "1.0.0",
-  "description": "Expirementing near fully typed TypeScript events",
+  "name": "howl",
+  "version": "0.1.0",
+  "description": "Fully typed typescript events",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
