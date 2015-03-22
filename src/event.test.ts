@@ -5,7 +5,9 @@ require('source-map-support').install();
 
 import expect = require("expect.js");
 
-import Event = require('./event');
+import Howl = require('./event');
+
+import Event = Howl.Event;
 
 describe("events", () => {
 

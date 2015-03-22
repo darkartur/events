@@ -1,4 +1,4 @@
-class Event<TParam> {
+export class Event<TParam> {
 
     add<TChildParam>(child_param?: TParam): Event<TChildParam> {
         var child: Event<TChildParam> = new Event<TChildParam>();
@@ -135,5 +135,3 @@ interface Callback<TParam> {
 function isSameOrFalsy(staff, same_or_falsy) {
     return !same_or_falsy || staff == same_or_falsy;
 }
-
-export = Event;
