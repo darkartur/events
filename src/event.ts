@@ -1,137 +1,141 @@
-export class Event<TParam> {
+module Howl {
 
-    add<TChildParam>(child_param?: TParam): Event<TChildParam> {
-        var child: Event<TChildParam> = new Event<TChildParam>();
-        this.children.push(child);
-        child.parent = this;
-        child.parent_param = child_param;
-        return child;
-    }
+    export class Event<TParam> {
 
-    on(handler: Callback<TParam>): Event<TParam> {
-        this.addHandler(handler);
-        return this;
-    }
-
-    once(handler: Callback<TParam>): Event<TParam> {
-        this.addHandler(handler, true);
-        return this;
-    }
-
-    trigger(param?: TParam): Event<TParam> {
-        this.handlers.forEach((handler: Handler<TParam>) => {
-            handler.callback(param);
-            if (handler.once) {
-                this.off(handler.callback)
-            }
-        });
-
-        if (this.parent) {
-            this.parent.trigger(this.parent_param);
+        add<TChildParam>(child_param?: TParam): Event<TChildParam> {
+            var child: Event<TChildParam> = new Event<TChildParam>();
+            this.children.push(child);
+            child.parent = this;
+            child.parent_param = child_param;
+            return child;
         }
 
-        return this;
-    }
+        on(handler: Callback<TParam>): Event<TParam> {
+            this.addHandler(handler);
+            return this;
+        }
 
-    off(handler?: Callback<TParam>): Event<TParam> {
-        this.handlers = this.handlers.filter((someHandler: Handler<TParam>) => {
-            var listener: Event<TParam> = someHandler.listener;
+        once(handler: Callback<TParam>): Event<TParam> {
+            this.addHandler(handler, true);
+            return this;
+        }
 
-            if (isSameOrFalsy(someHandler.callback, handler)) {
-                if (listener) {
-                    listener.removeListening(this, someHandler.callback)
+        trigger(param?: TParam): Event<TParam> {
+            this.handlers.forEach((handler: Handler<TParam>) => {
+                handler.callback(param);
+                if (handler.once) {
+                    this.off(handler.callback)
+                }
+            });
+
+            if (this.parent) {
+                this.parent.trigger(this.parent_param);
+            }
+
+            return this;
+        }
+
+        off(handler?: Callback<TParam>): Event<TParam> {
+            this.handlers = this.handlers.filter((someHandler: Handler<TParam>) => {
+                var listener: Event<TParam> = someHandler.listener;
+
+                if (isSameOrFalsy(someHandler.callback, handler)) {
+                    if (listener) {
+                        listener.removeListening(this, someHandler.callback)
+                    }
+
+                    return false;
                 }
 
-                return false;
+                return true;
+            });
+
+            this.children.forEach((child: Event<TParam>) => {
+                child.off();
+            });
+
+            return this;
+        }
+
+        listenTo<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
+            source.addHandler(handler, false, this);
+            this.listenings.push({
+                source: source,
+                handler: handler
+            });
+            return this;
+        }
+
+        listenToOnce<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
+            source.addHandler(handler, true, this);
+            this.listenings.push({
+                source: source,
+                handler: handler
+            });
+            return this;
+        }
+
+        stopListening<TSourceParam>(source?: Event<TSourceParam>, callback?: Callback<TSourceParam>): Event<TParam> {
+            this.listenings.forEach((listening: Listening<TSourceParam>) => {
+                if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, callback)) {
+                    listening.source.off(listening.handler);
+                    return false;
+                }
+
+                return true;
+            });
+
+            if (source) {
+                source.children.forEach((child: Event<any>) => {
+                    this.stopListening(child, callback);
+                });
             }
 
-            return true;
-        });
+            this.children.forEach((child: Event<any>) => {
+                child.stopListening(source, callback);
+            });
 
-        this.children.forEach((child: Event<TParam>) => {
-            child.off();
-        });
+            return this;
+        }
 
-        return this;
-    }
-
-    listenTo<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
-        source.addHandler(handler, false, this);
-        this.listenings.push({
-            source: source,
-            handler: handler
-        });
-        return this;
-    }
-
-    listenToOnce<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
-        source.addHandler(handler, true, this);
-        this.listenings.push({
-            source: source,
-            handler: handler
-        });
-        return this;
-    }
-
-    stopListening<TSourceParam>(source?: Event<TSourceParam>, callback?: Callback<TSourceParam>): Event<TParam> {
-        this.listenings.forEach((listening: Listening<TSourceParam>) => {
-            if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, callback)) {
-                listening.source.off(listening.handler);
-                return false;
-            }
-
-            return true;
-        });
-
-        if (source) {
-            source.children.forEach((child: Event<any>) => {
-                this.stopListening(child, callback);
+        private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: Event<any>) {
+            this.handlers.push({
+                callback: callback,
+                once: once,
+                listener: listener
             });
         }
 
-        this.children.forEach((child: Event<any>) => {
-            child.stopListening(source, callback);
-        });
+        private removeListening<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>) {
+            this.listenings.filter((listening: Listening<TSourceParam>) => {
+                return listening.handler != handler || listening.source != source;
+            });
+        }
 
-        return this;
+        private parent: Event<any>;
+        private parent_param: any;
+        private children: Event<any>[] = [];
+        private handlers: Array<Handler<TParam>> = [];
+        private listenings: Array<Listening<any>> = [];
     }
 
-    private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: Event<any>) {
-        this.handlers.push({
-            callback: callback,
-            once: once,
-            listener: listener
-        });
+    interface Listening<TParam> {
+        source: Event<TParam>;
+        handler: Callback<TParam>;
     }
 
-    private removeListening<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>) {
-        this.listenings.filter((listening: Listening<TSourceParam>) => {
-            return listening.handler != handler || listening.source != source;
-        });
+    interface Handler<TParam> {
+        callback: Callback<TParam>;
+        once: boolean;
+        listener: Event<any>;
     }
 
-    private parent: Event<any>;
-    private parent_param: any;
-    private children: Event<any>[] = [];
-    private handlers: Array<Handler<TParam>> = [];
-    private listenings: Array<Listening<any>> = [];
-}
+    interface Callback<TParam> {
+        (param: TParam): void;
+    }
 
-interface Listening<TParam> {
-    source: Event<TParam>;
-    handler: Callback<TParam>;
-}
+    function isSameOrFalsy(staff, same_or_falsy) {
+        return !same_or_falsy || staff == same_or_falsy;
+    }
 
-interface Handler<TParam> {
-    callback: Callback<TParam>;
-    once: boolean;
-    listener: Event<any>;
-}
-
-interface Callback<TParam> {
-    (param: TParam): void;
-}
-
-function isSameOrFalsy(staff, same_or_falsy) {
-    return !same_or_falsy || staff == same_or_falsy;
 }
