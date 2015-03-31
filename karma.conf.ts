@@ -6,7 +6,8 @@ function karmaConf(config) {
 
         files: [
             'node_modules/expect.js/index.js',
-            'src/**/*.js'
+            'index.test.js',
+            'index.js'
         ],
 
         client: {

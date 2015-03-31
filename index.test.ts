@@ -1,7 +1,7 @@
-/// <reference path="../typings/mocha/mocha.d.ts" />
-/// <reference path="../typings/node/node.d.ts" />
-/// <reference path="../typings/expect/expect.d.ts" />
-/// <reference path="./event.ts" />
+/// <reference path="typings/mocha/mocha.d.ts" />
+/// <reference path="./typings/node/node.d.ts" />
+/// <reference path="./typings/expect/expect.d.ts" />
+/// <reference path="./index.ts" />
 
 describe("events", () => {
 
