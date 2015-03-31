@@ -1,16 +1,16 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 /// <reference path="../typings/node/node.d.ts" />
 /// <reference path="../typings/expect/expect.d.ts" />
-var Event = Howl.Event;
+/// <reference path="./event.ts" />
 
 describe("events", () => {
 
     describe("single event", () => {
 
-        var event: Event<void>;
+        var event: Howl.Event<void>;
 
         beforeEach(() => {
-            event = new Event<void>();
+            event = new Howl.Event<void>();
         });
 
         it("on and trigger", (done) => {
@@ -94,7 +94,7 @@ describe("events", () => {
         });
 
         it("listenTo and stopListening", () => {
-            var eventListener: Event<void> = new Event<void>(),
+            var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
             eventListener.listenTo(event, () => {
@@ -112,7 +112,7 @@ describe("events", () => {
         });
 
         it("listenToOnce", () => {
-            var eventListener: Event<void> = new Event<void>(),
+            var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
             eventListener.listenToOnce(event, () => {
@@ -126,7 +126,7 @@ describe("events", () => {
         });
 
         it("listenToOnce and stopListening", () => {
-            var eventListener: Event<void> = new Event<void>(),
+            var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
             eventListener.listenToOnce(event, () => {
@@ -141,7 +141,7 @@ describe("events", () => {
         });
 
         it("stopListening should off only listener handlers", (done) => {
-            var eventListener: Event<void> = new Event<void>();
+            var eventListener: Howl.Event<void> = new Howl.Event<void>();
 
             event.on(done);
 
@@ -150,7 +150,7 @@ describe("events", () => {
         });
 
         it("stopListening target handler", (done) => {
-            var event_listener: Event<void> = new Event<void>(),
+            var event_listener: Howl.Event<void> = new Howl.Event<void>(),
                 disablingHandler: () => void = () => {};
 
             event_listener.listenTo(event, disablingHandler);
@@ -161,8 +161,8 @@ describe("events", () => {
         });
 
         it("stopListening all", () => {
-            var listener: Event<void> = new Event<void>(),
-                other_event: Event<void> = new Event<void>(),
+            var listener: Howl.Event<void> = new Howl.Event<void>(),
+                other_event: Howl.Event<void> = new Howl.Event<void>(),
                 is_fired: boolean = false;
 
             function cb() {
@@ -185,16 +185,16 @@ describe("events", () => {
     describe("hierarchical events", () => {
 
         it("tree off", () => {
-            var root: Event<void>,
-                childA: Event<void>,
-                childB: Event<void>,
+            var root: Howl.Event<void>,
+                childA: Howl.Event<void>,
+                childB: Howl.Event<void>,
                 is_fired: boolean = false;
 
             function handler() {
                 is_fired = true;
             }
 
-            root = new Event<void>();
+            root = new Howl.Event<void>();
             childA = root.add<void>();
             childB = root.add<void>();
 
@@ -210,17 +210,17 @@ describe("events", () => {
         });
 
         it("tree trigger", (done) => {
-            var parent: Event<void> = new Event<void>(),
-                child: Event<void> = parent.add<void>();
+            var parent: Howl.Event<void> = new Howl.Event<void>(),
+                child: Howl.Event<void> = parent.add<void>();
 
             parent.on(done);
             child.trigger();
         });
 
         it("stopListening source children", () => {
-            var listener: Event<void> = new Event<void>(),
-                parent: Event<void> = new Event<void>(),
-                child: Event<void> = parent.add<void>(),
+            var listener: Howl.Event<void> = new Howl.Event<void>(),
+                parent: Howl.Event<void> = new Howl.Event<void>(),
+                child: Howl.Event<void> = parent.add<void>(),
                 is_fired: boolean = false;
 
             listener.listenTo(child, () => {
@@ -235,9 +235,9 @@ describe("events", () => {
         });
 
         it("stopListening source children", () => {
-            var source: Event<void> = new Event<void>(),
-                parent: Event<void> = new Event<void>(),
-                child: Event<void> = parent.add<void>(),
+            var source: Howl.Event<void> = new Howl.Event<void>(),
+                parent: Howl.Event<void> = new Howl.Event<void>(),
+                child: Howl.Event<void> = parent.add<void>(),
                 is_fired: boolean = false;
 
             child.listenTo(source, () => {
@@ -254,10 +254,10 @@ describe("events", () => {
     });
 
     describe("events with parameter", () => {
-        var event: Event<number>;
+        var event: Howl.Event<number>;
 
         beforeEach(() => {
-            event = new Event<number>();
+            event = new Howl.Event<number>();
         });
 
         it("on", () => {
@@ -286,7 +286,7 @@ describe("events", () => {
 
         it("listenTo", () => {
             var fired_value: number = null,
-                listener: Event<number> = new Event<number>();
+                listener: Howl.Event<number> = new Howl.Event<number>();
 
             listener.listenTo(event,(param: number) => {
                 fired_value = param;
@@ -299,7 +299,7 @@ describe("events", () => {
 
         it("listenToOnce", () => {
             var fired_value: number = null,
-                listener: Event<number> = new Event<number>();
+                listener: Howl.Event<number> = new Howl.Event<number>();
 
             listener.listenToOnce(event,(param: number) => {
                 fired_value = param;
@@ -311,11 +311,11 @@ describe("events", () => {
         });
 
         it("parameters in tree", () => {
-            var parent: Event<string>,
-                child: Event<void>,
+            var parent: Howl.Event<string>,
+                child: Howl.Event<void>,
                 fired_parameter: string = null;
 
-            parent = new Event<string>();
+            parent = new Howl.Event<string>();
             child = parent.add<void>("test");
 
             parent.on((param: string) => {
