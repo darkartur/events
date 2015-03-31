@@ -62,22 +62,27 @@ module Howl {
             return this;
         }
 
-        listenTo<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
-            source.addHandler(handler, false, this);
-            this.listenings.push({
-                source: source,
-                handler: handler
-            });
-            return this;
-        }
+        till(listener: Event<any>): IListen<TParam> {
+            var source: Event<TParam> = this;
 
-        listenToOnce<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>): Event<TParam> {
-            source.addHandler(handler, true, this);
-            this.listenings.push({
-                source: source,
-                handler: handler
-            });
-            return this;
+            return {
+                listen(handler: Callback<TParam>) {
+                    source.addHandler(handler, false, listener);
+                    listener.listenings.push({
+                        source: source,
+                        handler: handler
+                    });
+                    return this;
+                },
+                once(handler: Callback<TParam>) {
+                    source.addHandler(handler, true, listener);
+                    listener.listenings.push({
+                        source: source,
+                        handler: handler
+                    });
+                    return this;
+                }
+            };
         }
 
         stopListening<TSourceParam>(source?: Event<TSourceParam>, callback?: Callback<TSourceParam>): Event<TParam> {
