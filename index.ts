@@ -1,6 +1,11 @@
 module Howl {
 
-    export class Event<TParam> {
+    interface IListen<TParam> {
+        listen(handler: Callback<TParam>): IListen<TParam>;
+        once(handler: Callback<TParam>): IListen<TParam>;
+    }
+
+    export class Event<TParam> implements IListen<TParam> {
 
         add<TChildParam>(child_param?: TParam): Event<TChildParam> {
             var child: Event<TChildParam> = new Event<TChildParam>();
