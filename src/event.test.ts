@@ -1,13 +1,7 @@
 /// <reference path="../typings/mocha/mocha.d.ts" />
 /// <reference path="../typings/node/node.d.ts" />
 /// <reference path="../typings/expect/expect.d.ts" />
-require('source-map-support').install();
-
-import expect = require("expect.js");
-
-import Howl = require('./event');
-
-import Event = Howl.Event;
+var Event = Howl.Event;
 
 describe("events", () => {
 
