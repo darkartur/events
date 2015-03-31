@@ -93,11 +93,11 @@ describe("events", () => {
             event.trigger();
         });
 
-        it("till.listen and stopListening", () => {
+        it("toward.listen and stopListening", () => {
             var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
-            event.till(eventListener).listen(() => {
+            event.toward(eventListener).listen(() => {
                 counter++;
             });
 
@@ -111,11 +111,11 @@ describe("events", () => {
             expect(counter).to.be(2);
         });
 
-        it("till.once", () => {
+        it("toward.once", () => {
             var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
-            event.till(eventListener).once(() => {
+            event.toward(eventListener).once(() => {
                 counter++;
             });
 
@@ -125,11 +125,11 @@ describe("events", () => {
             expect(counter).to.be(1);
         });
 
-        it("till.once and stopListening", () => {
+        it("toward.once and stopListening", () => {
             var eventListener: Howl.Event<void> = new Howl.Event<void>(),
                 counter: number = 0;
 
-            event.till(eventListener).once(() => {
+            event.toward(eventListener).once(() => {
                 counter++;
             });
 
@@ -153,8 +153,8 @@ describe("events", () => {
             var event_listener: Howl.Event<void> = new Howl.Event<void>(),
                 disablingHandler: () => void = () => {};
 
-            event.till(event_listener).listen(disablingHandler);
-            event.till(event_listener).listen(done);
+            event.toward(event_listener).listen(disablingHandler);
+            event.toward(event_listener).listen(done);
 
             event_listener.stopListening(event, disablingHandler);
             event.trigger();
@@ -169,8 +169,8 @@ describe("events", () => {
                 is_fired = true;
             }
 
-            event.till(listener).listen(cb);
-            other_event.till(listener).listen(cb);
+            event.toward(listener).listen(cb);
+            other_event.toward(listener).listen(cb);
 
             listener.stopListening();
 
@@ -223,7 +223,7 @@ describe("events", () => {
                 child: Howl.Event<void> = parent.add<void>(),
                 is_fired: boolean = false;
 
-            child.till(listener).listen(() => {
+            child.toward(listener).listen(() => {
                 is_fired = true;
             });
 
@@ -240,7 +240,7 @@ describe("events", () => {
                 child: Howl.Event<void> = parent.add<void>(),
                 is_fired: boolean = false;
 
-            source.till(child).listen(() => {
+            source.toward(child).listen(() => {
                 is_fired = true;
             });
 
@@ -284,11 +284,11 @@ describe("events", () => {
 
         });
 
-        it("till.listen", () => {
+        it("toward.listen", () => {
             var fired_value: number = null,
                 listener: Howl.Event<number> = new Howl.Event<number>();
 
-            event.till(listener).listen((param: number) => {
+            event.toward(listener).listen((param: number) => {
                 fired_value = param;
             });
 
@@ -297,11 +297,11 @@ describe("events", () => {
 
         });
 
-        it("till.once", () => {
+        it("toward.once", () => {
             var fired_value: number = null,
                 listener: Howl.Event<number> = new Howl.Event<number>();
 
-            event.till(listener).once((param: number) => {
+            event.toward(listener).once((param: number) => {
                 fired_value = param;
             });
 

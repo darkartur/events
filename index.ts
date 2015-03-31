@@ -62,7 +62,7 @@ module Howl {
             return this;
         }
 
-        till(listener: Event<any>): IListen<TParam> {
+        toward(listener: Event<any>): IListen<TParam> {
             var source: Event<TParam> = this;
 
             return {
