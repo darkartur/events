@@ -10,7 +10,7 @@ module Howl {
             return child;
         }
 
-        on(handler: Callback<TParam>): Event<TParam> {
+        listen(handler: Callback<TParam>): Event<TParam> {
             this.addHandler(handler);
             return this;
         }

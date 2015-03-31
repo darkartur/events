@@ -14,7 +14,7 @@ describe("events", () => {
         });
 
         it("on and trigger", (done) => {
-            event.on(done);
+            event.listen(done);
             event.trigger();
         });
 
@@ -22,11 +22,11 @@ describe("events", () => {
             var fire_a: boolean = false,
                 fire_b: boolean = false;
 
-            event.on(() => {
+            event.listen(() => {
                 fire_a = true;
             });
 
-            event.on(() => {
+            event.listen(() => {
                 fire_b = true;
             });
 
@@ -39,7 +39,7 @@ describe("events", () => {
         it("multiple trigger", () => {
             var counter: number = 0;
 
-            event.on(() => {
+            event.listen(() => {
                 counter++;
             });
 
@@ -65,7 +65,7 @@ describe("events", () => {
 
         it("once + on", (done) => {
             event.once(() => {});
-            event.on(done);
+            event.listen(done);
 
             event.trigger();
         });
@@ -73,7 +73,7 @@ describe("events", () => {
         it("off", () => {
             var event_is_fired: boolean = false;
 
-            event.on(() => {
+            event.listen(() => {
                 event_is_fired = true;
             });
 
@@ -86,8 +86,8 @@ describe("events", () => {
         it("off target handler", (done) => {
             var disablingHandler: () => void = () => {};
 
-            event.on(disablingHandler);
-            event.on(done);
+            event.listen(disablingHandler);
+            event.listen(done);
 
             event.off(disablingHandler);
             event.trigger();
@@ -143,7 +143,7 @@ describe("events", () => {
         it("stopListening should off only listener handlers", (done) => {
             var eventListener: Howl.Event<void> = new Howl.Event<void>();
 
-            event.on(done);
+            event.listen(done);
 
             eventListener.stopListening(event);
             event.trigger();
@@ -198,8 +198,8 @@ describe("events", () => {
             childA = root.add<void>();
             childB = root.add<void>();
 
-            childA.on(handler);
-            childB.on(handler);
+            childA.listen(handler);
+            childB.listen(handler);
 
             root.off();
 
@@ -213,7 +213,7 @@ describe("events", () => {
             var parent: Howl.Event<void> = new Howl.Event<void>(),
                 child: Howl.Event<void> = parent.add<void>();
 
-            parent.on(done);
+            parent.listen(done);
             child.trigger();
         });
 
@@ -263,7 +263,7 @@ describe("events", () => {
         it("on", () => {
             var fired_value: number = null;
 
-            event.on((param: number) => {
+            event.listen((param: number) => {
                 fired_value = param;
             });
 
@@ -318,7 +318,7 @@ describe("events", () => {
             parent = new Howl.Event<string>();
             child = parent.add<void>("test");
 
-            parent.on((param: string) => {
+            parent.listen((param: string) => {
                 fired_parameter = param;
             });
 
