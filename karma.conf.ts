@@ -1,4 +1,6 @@
-function karmaConf(config) {
+declare var module;
+
+module.exports = (config) => {
     config.set({
         browsers: ['Chrome'],
 
@@ -17,6 +19,4 @@ function karmaConf(config) {
             }
         }
     });
-}
-
-export = karmaConf;
+};
