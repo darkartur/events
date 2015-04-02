@@ -217,7 +217,7 @@ describe("events", () => {
             child.trigger();
         });
 
-        it("stopListening source children", () => {
+        it("stopListening should affect source children", () => {
             var listener: Howl.Event<void> = new Howl.Event<void>(),
                 parent: Howl.Event<void> = new Howl.Event<void>(),
                 child: Howl.Event<void> = parent.add<void>(),
@@ -234,7 +234,7 @@ describe("events", () => {
             expect(is_fired).to.be(false);
         });
 
-        it("stopListening source children", () => {
+        it("stopListening should affect listener children", () => {
             var source: Howl.Event<void> = new Howl.Event<void>(),
                 parent: Howl.Event<void> = new Howl.Event<void>(),
                 child: Howl.Event<void> = parent.add<void>(),

@@ -5,7 +5,48 @@ module Howl {
         once(handler: Callback<TParam>): IListen<TParam>;
     }
 
-    export class Event<TParam> implements IListen<TParam> {
+    class EventEngine<TParam> implements IListen<TParam> {
+
+        listen(callback: Callback<TParam>): EventEngine<TParam> {
+            this.handlers.push({
+                callback: callback,
+                once: false
+            });
+            return this;
+        }
+
+        once(callback: Callback<TParam>): EventEngine<TParam> {
+            this.handlers.push({
+                callback: callback,
+                once: true
+            });
+            return this;
+        }
+
+        off(callback?: Callback<TParam>): EventEngine<TParam> {
+            this.handlers = this.handlers.filter((handler: Handler<TParam>) => {
+                return !isSameOrFalsy(handler.callback, callback);
+            });
+            return this;
+        }
+
+        protected executeHandlers(param?: TParam) {
+            this.handlers.forEach((handler: Handler<TParam>) => {
+                handler.callback(param);
+                if (handler.once) {
+                    this.off(handler.callback)
+                }
+            });
+        }
+
+        protected static executeHandlersOn<TParam>(target: EventEngine<TParam>, param?: TParam) {
+            target.executeHandlers(param);
+        }
+
+        private handlers: Array<Handler<TParam>> = [];
+    }
+
+    export class Event<TParam> extends EventEngine<TParam> implements IListen<TParam> {
 
         add<TChildParam>(child_param?: TParam): Event<TChildParam> {
             var child: Event<TChildParam> = new Event<TChildParam>();
@@ -15,129 +56,103 @@ module Howl {
             return child;
         }
 
-        listen(handler: Callback<TParam>): Event<TParam> {
-            this.addHandler(handler);
-            return this;
-        }
-
-        once(handler: Callback<TParam>): Event<TParam> {
-            this.addHandler(handler, true);
-            return this;
-        }
-
         trigger(param?: TParam): Event<TParam> {
-            this.handlers.forEach((handler: Handler<TParam>) => {
-                handler.callback(param);
-                if (handler.once) {
-                    this.off(handler.callback)
-                }
-            });
+            this.executeHandlers(param);
 
             if (this.parent) {
                 this.parent.trigger(this.parent_param);
             }
 
+            this.listenings.forEach((listening: Listening<TParam>) => {
+                if (listening.source === this) {
+                    EventEngine.executeHandlersOn(listening.proxy, param);
+                }
+            });
+
             return this;
         }
 
         off(handler?: Callback<TParam>): Event<TParam> {
-            this.handlers = this.handlers.filter((someHandler: Handler<TParam>) => {
-                var listener: Event<TParam> = someHandler.listener;
-
-                if (isSameOrFalsy(someHandler.callback, handler)) {
-                    if (listener) {
-                        listener.removeListening(this, someHandler.callback)
-                    }
-
-                    return false;
-                }
-
-                return true;
-            });
+            super.off(handler);
 
             this.children.forEach((child: Event<TParam>) => {
-                child.off();
+                child.off(handler);
             });
 
             return this;
         }
 
         toward(listener: Event<any>): IListen<TParam> {
-            var source: Event<TParam> = this;
+            var listening: Listening<TParam>;
 
-            return {
-                listen(handler: Callback<TParam>) {
-                    source.addHandler(handler, false, listener);
-                    listener.listenings.push({
-                        source: source,
-                        handler: handler
-                    });
-                    return this;
-                },
-                once(handler: Callback<TParam>) {
-                    source.addHandler(handler, true, listener);
-                    listener.listenings.push({
-                        source: source,
-                        handler: handler
-                    });
-                    return this;
-                }
-            };
+            listening = find<TParam>(this.listenings, (listening: Listening<TParam>) => {
+                return listening.listener == listener;
+            });
+
+            if (!listening) {
+                listening = {
+                    listener: listener,
+                    source: this,
+                    proxy: new EventEngine<TParam>()
+                };
+
+                this.listenings.push(listening);
+                listener.listenings.push(listening);
+            }
+
+            return listening.proxy;
         }
 
-        stopListening<TSourceParam>(source?: Event<TSourceParam>, callback?: Callback<TSourceParam>): Event<TParam> {
-            this.listenings.forEach((listening: Listening<TSourceParam>) => {
-                if (isSameOrFalsy(listening.source, source) && isSameOrFalsy(listening.handler, callback)) {
-                    listening.source.off(listening.handler);
-                    return false;
-                }
+        stopListening(source?: Event<any>, callback?: Callback<any>): Event<TParam> {
+            var sources: Event<any>[] = [];
 
+            this.listenings = this.listenings.filter((listening) => {
+                if (isSameOrFalsy(listening.source, source)) {
+                    listening.proxy.off(callback);
+                    if (!callback) {
+                        sources.push(listening.source);
+                        return false;
+                    }
+                }
                 return true;
             });
 
+            sources.forEach((source) => {
+                source.listenings = source.listenings.filter((listening) => {
+                    return listening.listener !== this;
+                })
+            });
+
             if (source) {
-                source.children.forEach((child: Event<any>) => {
+                source.children.forEach((child) => {
                     this.stopListening(child, callback);
                 });
             }
 
-            this.children.forEach((child: Event<any>) => {
+            this.children.forEach((child) => {
                 child.stopListening(source, callback);
             });
 
             return this;
         }
 
-        private addHandler(callback: Callback<TParam>, once: boolean = false, listener?: Event<any>) {
-            this.handlers.push({
-                callback: callback,
-                once: once,
-                listener: listener
-            });
-        }
-
-        private removeListening<TSourceParam>(source: Event<TSourceParam>, handler: Callback<TSourceParam>) {
-            this.listenings.filter((listening: Listening<TSourceParam>) => {
-                return listening.handler != handler || listening.source != source;
-            });
-        }
-
         private parent: Event<any>;
         private parent_param: any;
         private children: Event<any>[] = [];
-        private handlers: Array<Handler<TParam>> = [];
-        private listenings: Array<Listening<any>> = [];
+        private listenings: Listening<TParam>[] = [];
     }
 
+
     interface Listening<TParam> {
+        listener: Event<any>;
         source: Event<TParam>;
-        handler: Callback<TParam>;
+        proxy: EventEngine<TParam>;
     }
+
 
     interface Handler<TParam> {
         callback: Callback<TParam>;
         once: boolean;
-        listener: Event<any>;
     }
 
     interface Callback<TParam> {
@@ -146,6 +161,21 @@ module Howl {
 
     function isSameOrFalsy(staff, same_or_falsy) {
         return !same_or_falsy || staff == same_or_falsy;
+    }
+
+    function find<TParam>(listenings: Listening<TParam>[], predicate: (item: Listening<TParam>) => {}) {
+        var i: number,
+            f: Listening<TParam>,
+            c: Listening<TParam>;
+
+        for (i = 0; !f && i < listenings.length; i++) {
+            c = listenings[i];
+            if (predicate(c)) {
+                return f = c;
+            }
+        }
+
+        return f;
     }
 
 }
