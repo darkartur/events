@@ -29,6 +29,6 @@
     "expect.js": "latest",
     "karma-chrome-launcher": "^0.1.7",
     "karma-mocha": "latest",
-    "karma-source-map-support": "^1.0.0"
+    "karma-source-map-support": "latest"
   }
 }

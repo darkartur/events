@@ -4,7 +4,7 @@ module.exports = (config) => {
     config.set({
         browsers: ['Chrome'],
 
-        frameworks: ['mocha', 'source-map-support'],
+        frameworks: ['mocha'/*, 'source-map-support'*/],
 
         files: [
             'node_modules/expect.js/index.js',
